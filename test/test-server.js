@@ -33,5 +33,21 @@ describe('BlogPosts', function() {
         });
     });
 
+    it('should add a blog post on POST', function() {
+        const newBlogPost = {title : 'TGIF!', content: 'I am soo ready for the weekend!', author: 'ME'};
+        return chai
+        .request(app)
+        .post('/blog-post')
+        .send(newBlogPost)
+        .then(function(res) {
+            expect(res).to.have.status(201);
+            expect(res).to.be.json;
+            expect(res).to.be.a('object');
+            expect(res).to.include.keys('id', 'title', 'content', 'author');
+            expect(res.body.id).to.not.equal(null);
+            expect(res.body).to.deep.equal(Object.assign(newBlogPost, {id: res.body.id}));
+        });
+    });
 
+    
 });
