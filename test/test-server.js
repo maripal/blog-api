@@ -42,12 +42,49 @@ describe('BlogPosts', function() {
         .then(function(res) {
             expect(res).to.have.status(201);
             expect(res).to.be.json;
-            expect(res).to.be.a('object');
-            expect(res).to.include.keys('id', 'title', 'content', 'author');
+            expect(res.body).to.be.a('object');
+            expect(res.body).to.include.keys('id', 'title', 'content', 'author');
             expect(res.body.id).to.not.equal(null);
-            expect(res.body).to.deep.equal(Object.assign(newBlogPost, {id: res.body.id}));
+            expect(res.body).to.deep.include(Object.assign(newBlogPost, {id: res.body.id}));
         });
     });
 
-    
+    it('should update blog post on PUT', function() {
+        const updateBlogPost = {title: "It's Friday!", content: "I'm so ready for the weekend!", author: "ME"};
+
+        return chai
+            .request(app)
+            .get('/blog-post')
+            .then(function(res) {
+                updateBlogPost.id = res.body[0].id;
+
+                return chai
+                .request(app) 
+                .put(`/blog-post/${updateBlogPost.id}`)
+                .send(updateBlogPost)
+            })
+
+            .then(function(res) {
+                expect(res).to.have.status(204);
+                //expect(res).to.be.json;
+                //expect(res.body).to.be.a('object');
+                //expect(res.body).to.deep.equal(updateBlogPost);
+            });
+    });
+
+    it('should delete blog post on DELETE', function() {
+        return (
+            chai
+            .request(app)
+            .get('/blog-post')
+            .then(function(res) {
+                return chai
+                .request(app)
+                .delete(`/blog-post/${res.body[0].id}`);
+            })
+            .then(function(res) {
+                expect(res).to.have.status(204);
+            })
+        );
+    });
 });
